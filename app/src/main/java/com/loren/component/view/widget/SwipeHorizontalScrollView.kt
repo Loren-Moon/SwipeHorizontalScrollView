@@ -86,9 +86,8 @@ class SwipeHorizontalScrollView(
                 contentHeight = max(contentHeight, childView.measuredHeight)
             }
         }
-        val h = (parent as? View?)?.measuredHeight ?: 0
 
-        setMeasuredDimension(contentWidth + paddingStart + paddingEnd, max(contentHeight + paddingTop + paddingBottom, h))
+        setMeasuredDimension(contentWidth + paddingStart + paddingEnd, contentHeight + paddingTop + paddingBottom)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -236,16 +235,7 @@ class SwipeHorizontalScrollView(
                                     }
                                 } else {
                                     monitorScrollViews().forEach {
-                                        it.mScroller.fling(
-                                            scrollX,
-                                            0,
-                                            (-xVelocity.toInt() * 1.5).toInt(),
-                                            0,
-                                            0,
-                                            maxX,
-                                            0,
-                                            0
-                                        )
+                                        it.mScroller.fling(scrollX, 0, (-xVelocity.toInt() * 1.5).toInt(), 0, 0, maxX, 0, 0)
                                     }
                                 }
                             }
@@ -269,10 +259,10 @@ class SwipeHorizontalScrollView(
 
     private fun allViewsScrollX(x: Int) {
         monitorScrollViews().forEach {
-            if (it != this) {
-                it.setShadow(x)
-                it.scrollTo(x, 0)
-            }
+//            if (it != this) {
+            it.setShadow(x)
+            it.scrollTo(x, 0)
+//            }
         }
         setRecordX(x)
     }

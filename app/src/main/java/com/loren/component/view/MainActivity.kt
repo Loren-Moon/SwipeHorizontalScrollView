@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.loren.component.view.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -50,9 +51,11 @@ class StockAdapter(private val data: List<StockModel>?) : RecyclerView.Adapter<S
         init {
             itemView.setOnClickListener {
                 Log.v("Loren", "click--------->")
+                Snackbar.make(itemView, "click", Snackbar.LENGTH_SHORT).show()
             }
             itemView.setOnLongClickListener {
                 Log.v("Loren", "long click--------->")
+                Snackbar.make(itemView, "long click", Snackbar.LENGTH_SHORT).show()
                 true
             }
         }
