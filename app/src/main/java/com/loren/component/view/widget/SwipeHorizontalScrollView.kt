@@ -203,7 +203,7 @@ class SwipeHorizontalScrollView(
                     }
                 }
             }
-            MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (abs(downPoint.x - event.x) < touchSlop && abs(downPoint.y - event.y) < touchSlop) {
                     (tag as? View)?.onTouchEvent(event)
                 }
