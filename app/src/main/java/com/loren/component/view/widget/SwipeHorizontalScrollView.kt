@@ -75,10 +75,11 @@ class SwipeHorizontalScrollView(
             scrollTo(mScroller.currX, mScroller.currY)
             postInvalidate()
         } else {
+            recyclerView?.needNotify = true
             if (needFix) {
                 fixScrollX()
+                postInvalidate()
             }
-            postInvalidate()
         }
     }
 
@@ -172,7 +173,6 @@ class SwipeHorizontalScrollView(
                 }
             }
             MotionEvent.ACTION_UP -> {
-                recyclerView?.needNotify = true
             }
             MotionEvent.ACTION_CANCEL -> {
                 (tag as? View)?.cancelLongPress()
