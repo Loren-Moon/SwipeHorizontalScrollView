@@ -1,9 +1,12 @@
 package com.loren.component.view.widget
 
 import android.annotation.SuppressLint
+import android.app.Service
 import android.content.Context
 import android.graphics.PointF
+import android.os.Vibrator
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.OverScroller
 import com.loren.component.view.R
@@ -30,24 +33,40 @@ class SwipeHorizontalScrollView(
     private val mScrollViews = mutableListOf<SwipeHorizontalScrollView>()
     private var isNeedHideLeftView = false
     private var isNeedShowShadow = true
+    private var isNeedVibrate = true
+    private var extendThreshold: Float? = null
+    private var foldThreshold: Float? = null
     private var viewWidth = 0
 
     private var velocityTracker: VelocityTracker? = null
-    private val mMinimumVelocity = ViewConfiguration.get(context).scaledMinimumFlingVelocity
-    private val mMaximumVelocity = ViewConfiguration.get(context).scaledMaximumFlingVelocity
+    private val mMinimumVelocity = 1000
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
     private val mScroller by lazy { OverScroller(context) }
     private val downPoint = PointF()
     private var moveX = 0f
-    private var isShowLeft = false
+    var isShowLeft = false
     private var needFix = false
     private var mDirection = Direction.DIRECTION_LEFT // 内容滚动方向
 
-    fun setRecyclerView(recyclerView: HorizontalRecyclerView, isNeedHideLeftView: Boolean = false, isNeedShowShadow: Boolean = true) {
+    private val firstViewWidth by lazy {
+        getChildAt(0).measuredWidth
+    }
+
+    fun setRecyclerView(
+        recyclerView: HorizontalRecyclerView,
+        isNeedHideLeftView: Boolean = false,
+        isNeedShowShadow: Boolean = true,
+        isNeedVibrate: Boolean = true,
+        extendThreshold: Float? = null,
+        foldThreshold: Float? = null
+    ) {
         this.recyclerView = recyclerView
         this.isNeedHideLeftView = isNeedHideLeftView
         this.isNeedShowShadow = isNeedShowShadow
+        this.isNeedVibrate = isNeedVibrate
+        this.extendThreshold = extendThreshold
+        this.foldThreshold = foldThreshold
     }
 
     override fun computeScroll() {
@@ -189,7 +208,6 @@ class SwipeHorizontalScrollView(
                 val afterScrollX = scrollX + deltaX
 
                 if (isNeedHideLeftView) {
-                    val firstViewWidth = getChildAt(0).measuredWidth
                     if (afterScrollX >= -firstViewWidth && afterScrollX <= measuredWidth - viewWidth - firstViewWidth) {
                         if ((afterScrollX >= -firstViewWidth && afterScrollX < 0) || afterScrollX == 0 && deltaX < 0) {
                             scrollBy(deltaX / 2, 0)
@@ -210,7 +228,6 @@ class SwipeHorizontalScrollView(
                 // 释放
                 velocityTracker?.run {
                     computeCurrentVelocity(1000)
-                    val firstViewWidth = getChildAt(0).measuredWidth
                     if (abs(xVelocity) > mMinimumVelocity) {
                         needFix = true
                         if (isShowLeft) {
@@ -225,9 +242,9 @@ class SwipeHorizontalScrollView(
                                         it.mScroller.fling(
                                             scrollX,
                                             0,
-                                            (-xVelocity.toInt() * 1.5).toInt(),
+                                            -xVelocity.toInt(),
                                             0,
-                                            -(firstViewWidth * 0.2).toInt(),
+                                            -((extendThreshold ?: (firstViewWidth * 0.3f) - 1)).toInt(),
                                             maxX - firstViewWidth,
                                             0,
                                             0
@@ -235,7 +252,7 @@ class SwipeHorizontalScrollView(
                                     }
                                 } else {
                                     monitorScrollViews().forEach {
-                                        it.mScroller.fling(scrollX, 0, (-xVelocity.toInt() * 1.5).toInt(), 0, 0, maxX, 0, 0)
+                                        it.mScroller.fling(scrollX, 0, -xVelocity.toInt(), 0, 0, maxX, 0, 0)
                                     }
                                 }
                             }
@@ -255,6 +272,16 @@ class SwipeHorizontalScrollView(
             moveX = it.x
         }
         return true
+    }
+
+    private fun vibrate() {
+        if (isNeedVibrate) {
+            (context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator).let {
+                if (it.hasVibrator()) {
+                    it.vibrate(50)
+                }
+            }
+        }
     }
 
     private fun allViewsScrollX(x: Int) {
@@ -286,18 +313,21 @@ class SwipeHorizontalScrollView(
     private fun fixScrollX() {
         needFix = false
         if (isNeedHideLeftView) {
-            val firstViewWidth = getChildAt(0).measuredWidth
-            val threshold = firstViewWidth * 0.3 // [-firstViewWidth  -firstViewWidth+threshold    -threshold  0]
+            val threshold: Float // [-firstViewWidth  -firstViewWidth+threshold    -threshold  0]
             if (isShowLeft) { // 展开状态
+                threshold = foldThreshold ?: (firstViewWidth * 0.3f)
                 if (scrollX >= -firstViewWidth && scrollX <= -firstViewWidth + threshold) {
                     extend()
                 } else if (scrollX > -firstViewWidth + threshold) {
+                    vibrate()
                     fold()
                 }
             } else { // 收起状态
-                if (scrollX <= -threshold) {
+                threshold = extendThreshold ?: (firstViewWidth * 0.3f)
+                if (scrollX < -threshold) {
+                    vibrate()
                     extend()
-                } else if (scrollX > -threshold && scrollX <= 0) {
+                } else if (scrollX >= -threshold && scrollX <= 0) {
                     fold()
                 }
             }
@@ -310,19 +340,22 @@ class SwipeHorizontalScrollView(
     private fun extend() {
         val left = getChildAt(0).measuredWidth
         monitorScrollViews().forEach {
-            it.mScroller.startScroll(scrollX, 0, -left - scrollX, 0, 300)
+            it.mScroller.startScroll(scrollX, 0, -left - scrollX, 0, 800)
+            it.isShowLeft = true
         }
-        isShowLeft = true
     }
 
     /**
      * 折叠view
      */
     private fun fold() {
+        // 优化：左面被隐藏的view在展开的时候，view宽度的完整动画时长为800，要根据比例算出剩余view被隐藏的时长
+        val duration = if (isShowLeft) abs(1f * scrollX) / firstViewWidth * 800 else 1000
+        Log.v("Loren", "scrollX = $scrollX  duration = $duration")
         monitorScrollViews().forEach {
-            it.mScroller.startScroll(scrollX, 0, -scrollX, 0, 300)
+            it.mScroller.startScroll(scrollX, 0, -scrollX, 0, duration.toInt())
+            it.isShowLeft = false
         }
-        isShowLeft = false
     }
 
 }

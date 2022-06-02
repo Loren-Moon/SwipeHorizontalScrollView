@@ -105,8 +105,11 @@
         android:id="@+id/rvStock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:extendThreshold="70dp"
+        app:foldThreshold="60dp"
         app:needHideLeft="true"
         app:needShadow="true"
+        app:needVibrate="true"
         tools:listitem="@layout/item_stock" />
 
 </LinearLayout>
