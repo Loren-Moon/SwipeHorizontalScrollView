@@ -3,8 +3,11 @@
 
 ## 如何使用
 [详细介绍](https://juejin.cn/post/7082759711824543752)
-`app:needHideLeft="true"`设置是否隐藏firstView
-`app:needShadow="true"`设置是否需要阴影
+- `app:needHideLeft="true"`设置是否隐藏firstView
+- `app:needShadow="true"`设置是否需要阴影
+- `app:needVibrate="true"`设置是否需要在折叠or展开触发震动效果
+- `app:extendThreshold="70dp"`设置展开的阈值
+- `app:foldThreshold="60dp"`设置折叠的阈值
 
 ```xml
 <com.loren.component.view.widget.SwipeHorizontalScrollView id="@+id/swipeHorizontalView">
@@ -17,6 +20,9 @@
         android:id="@+id/rvStock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:extendThreshold="70dp"
+        app:foldThreshold="60dp"
+        app:needVibrate="true"
         app:needHideLeft="true"
         app:needShadow="true" />
 ```
