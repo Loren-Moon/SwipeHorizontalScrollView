@@ -259,7 +259,7 @@ class SwipeHorizontalScrollView(
                         }
                     } else {
                         if (isNeedHideLeftView) {
-                            fixScrollX()
+                            fixScrollX(event.action == MotionEvent.ACTION_CANCEL)
                         }
                     }
                     postInvalidate()
@@ -310,25 +310,29 @@ class SwipeHorizontalScrollView(
     /**
      * 修正x位置
      */
-    private fun fixScrollX() {
+    private fun fixScrollX(interceptCancelEvent: Boolean = false) {
         needFix = false
         if (isNeedHideLeftView) {
             val threshold: Float // [-firstViewWidth  -firstViewWidth+threshold    -threshold  0]
             if (isShowLeft) { // 展开状态
                 threshold = foldThreshold ?: (firstViewWidth * 0.3f)
                 if (scrollX >= -firstViewWidth && scrollX <= -firstViewWidth + threshold) {
-                    extend()
+                    extend(interceptCancelEvent)
                 } else if (scrollX > -firstViewWidth + threshold) {
-                    vibrate()
-                    fold()
+                    if (!interceptCancelEvent) {
+                        vibrate()
+                    }
+                    fold(interceptCancelEvent)
                 }
             } else { // 收起状态
                 threshold = extendThreshold ?: (firstViewWidth * 0.3f)
                 if (scrollX < -threshold) {
-                    vibrate()
-                    extend()
+                    if (!interceptCancelEvent) {
+                        vibrate()
+                    }
+                    extend(interceptCancelEvent)
                 } else if (scrollX >= -threshold && scrollX <= 0) {
-                    fold()
+                    fold(interceptCancelEvent)
                 }
             }
         }
@@ -337,18 +341,21 @@ class SwipeHorizontalScrollView(
     /**
      * 展开view
      */
-    private fun extend() {
+    private fun extend(interceptCancelEvent: Boolean = false) {
         val left = getChildAt(0).measuredWidth
         monitorScrollViews().forEach {
             it.mScroller.startScroll(scrollX, 0, -left - scrollX, 0, 800)
             it.isShowLeft = true
+        }
+        if (!interceptCancelEvent) {
+            recyclerView?.updateState(ViewState.EXTEND)
         }
     }
 
     /**
      * 折叠view
      */
-    private fun fold() {
+    private fun fold(interceptCancelEvent: Boolean = false) {
         // 优化：左面被隐藏的view在展开的时候，view宽度的完整动画时长为800，要根据比例算出剩余view被隐藏的时长
         val duration = if (isShowLeft) abs(1f * scrollX) / firstViewWidth * 800 else 1000
         Log.v("Loren", "scrollX = $scrollX  duration = $duration")
@@ -356,6 +363,13 @@ class SwipeHorizontalScrollView(
             it.mScroller.startScroll(scrollX, 0, -scrollX, 0, duration.toInt())
             it.isShowLeft = false
         }
+        if (!interceptCancelEvent) {
+            recyclerView?.updateState(ViewState.FOLD)
+        }
+    }
+
+    enum class ViewState {
+        EXTEND, FOLD
     }
 
 }

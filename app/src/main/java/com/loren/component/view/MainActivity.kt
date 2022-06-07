@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.loren.component.view.databinding.ActivityMainBinding
+import com.loren.component.view.widget.HorizontalRecyclerView
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +34,16 @@ class MainActivity : AppCompatActivity() {
         stockAdapter = StockAdapter(list)
         mBinding.rvStock.adapter = stockAdapter
         mBinding.rvStock.bindHeadScrollView(mBinding.swipeHorizontalView)
+        mBinding.rvStock.setOnHorizontalRecyclerViewStateListener(object : HorizontalRecyclerView.OnHorizontalRecyclerViewStateListener {
+            override fun extend() {
+                Snackbar.make(mBinding.rvStock, "extend", Snackbar.LENGTH_SHORT).show()
+            }
+
+            override fun fold() {
+                Snackbar.make(mBinding.rvStock, "fold", Snackbar.LENGTH_SHORT).show()
+            }
+
+        })
     }
 
 }

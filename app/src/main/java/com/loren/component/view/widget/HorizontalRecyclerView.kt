@@ -110,4 +110,22 @@ class HorizontalRecyclerView(
             it.setShadow(recordX)
         }
     }
+
+    fun updateState(state: SwipeHorizontalScrollView.ViewState) {
+        when (state) {
+            SwipeHorizontalScrollView.ViewState.EXTEND -> mListener?.extend()
+            SwipeHorizontalScrollView.ViewState.FOLD -> mListener?.fold()
+        }
+    }
+
+    interface OnHorizontalRecyclerViewStateListener {
+        fun extend()
+        fun fold()
+    }
+
+    private var mListener: OnHorizontalRecyclerViewStateListener? = null
+
+    fun setOnHorizontalRecyclerViewStateListener(listener: OnHorizontalRecyclerViewStateListener?) {
+        this.mListener = listener
+    }
 }
