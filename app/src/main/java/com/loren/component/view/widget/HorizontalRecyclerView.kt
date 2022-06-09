@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.loren.component.view.R
 
 /**
- * Created by Loren on 2021/12/28
+ * Created by Loren on 2021/12/31
  * Description -> 水平滚动的RecyclerView
  */
 class HorizontalRecyclerView(
@@ -20,11 +20,13 @@ class HorizontalRecyclerView(
     val scrollViews by lazy { ArrayList<SwipeHorizontalScrollView>() }
     var recordX: Int = 0
     var needNotify = true
+    var isShowLeft = false
     private var needHideLeft = false
     private var needShadow = true
     private var needVibrate = true
     private var extendThreshold = -1f
     private var foldThreshold = -1f
+    private var defaultShowLeft = false
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -35,7 +37,9 @@ class HorizontalRecyclerView(
         needVibrate = obtainStyledAttributes.getBoolean(R.styleable.HorizontalRecyclerView_needVibrate, needVibrate)
         extendThreshold = obtainStyledAttributes.getDimension(R.styleable.HorizontalRecyclerView_extendThreshold, extendThreshold)
         foldThreshold = obtainStyledAttributes.getDimension(R.styleable.HorizontalRecyclerView_foldThreshold, foldThreshold)
+        defaultShowLeft = obtainStyledAttributes.getBoolean(R.styleable.HorizontalRecyclerView_defaultShowLeft, defaultShowLeft)
         obtainStyledAttributes.recycle()
+        isShowLeft = defaultShowLeft
     }
 
     override fun onScrollStateChanged(state: Int) {
@@ -46,12 +50,10 @@ class HorizontalRecyclerView(
     override fun addView(child: View?, index: Int, params: ViewGroup.LayoutParams?) {
         val rightScroll = child?.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
         rightScroll?.setRecyclerView(
-            this,
-            isNeedHideLeftView = needHideLeft,
-            isNeedShowShadow = needShadow,
-            isNeedVibrate = needVibrate,
+            this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
             extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
-            foldThreshold = if (foldThreshold == -1f) null else foldThreshold
+            foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
+            defaultShowLeft = defaultShowLeft
         )
         rightScroll?.tag = child
 
@@ -61,18 +63,20 @@ class HorizontalRecyclerView(
         rightScroll?.scrollTo(recordX, 0)
     }
 
+    override fun removeView(view: View?) {
+        super.removeView(view)
+    }
+
     /**
      * 将recyclerview与headScrollView进行绑定
      */
     fun bindHeadScrollView(view: View) {
         val rightScroll = view.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
         rightScroll.setRecyclerView(
-            this,
-            isNeedHideLeftView = needHideLeft,
-            isNeedShowShadow = needShadow,
-            isNeedVibrate = needVibrate,
+            this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
             extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
-            foldThreshold = if (foldThreshold == -1f) null else foldThreshold
+            foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
+            defaultShowLeft = defaultShowLeft
         )
         rightScroll?.tag = decorateScrollView(rightScroll)
         if (scrollViews.contains(rightScroll)) scrollViews.remove(rightScroll)
@@ -128,4 +132,5 @@ class HorizontalRecyclerView(
     fun setOnHorizontalRecyclerViewStateListener(listener: OnHorizontalRecyclerViewStateListener?) {
         this.mListener = listener
     }
+
 }

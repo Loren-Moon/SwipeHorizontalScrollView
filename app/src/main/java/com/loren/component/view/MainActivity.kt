@@ -1,5 +1,6 @@
 package com.loren.component.view
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.loren.component.view.databinding.ActivityMainBinding
-import com.loren.component.view.widget.HorizontalRecyclerView
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,29 +21,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mBinding.root)
+    }
 
-        val list = mutableListOf<StockModel>()
-        for (index in 0 until 500) {
-            val childList = mutableListOf<String>()
-            for (i in 0 until 10) {
-                childList.add("${index}行${i + 1}列")
-            }
-            list.add(StockModel("$index", childList))
-        }
+    fun hideLeft(view: View) {
+        startActivity(Intent(this, HideLeftActivity::class.java))
+    }
 
-        stockAdapter = StockAdapter(list)
-        mBinding.rvStock.adapter = stockAdapter
-        mBinding.rvStock.bindHeadScrollView(mBinding.swipeHorizontalView)
-        mBinding.rvStock.setOnHorizontalRecyclerViewStateListener(object : HorizontalRecyclerView.OnHorizontalRecyclerViewStateListener {
-            override fun extend() {
-                Snackbar.make(mBinding.rvStock, "extend", Snackbar.LENGTH_SHORT).show()
-            }
-
-            override fun fold() {
-                Snackbar.make(mBinding.rvStock, "fold", Snackbar.LENGTH_SHORT).show()
-            }
-
-        })
+    fun defaultShowLeft(view: View) {
+        startActivity(Intent(this, DefaultShowLeftActivity::class.java))
     }
 
 }

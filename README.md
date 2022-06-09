@@ -8,6 +8,7 @@
 - `app:needVibrate="true"`设置是否需要在折叠or展开触发震动效果
 - `app:extendThreshold="70dp"`设置展开的阈值
 - `app:foldThreshold="60dp"`设置折叠的阈值
+- `app:defaultShowLeft="true"`设置默认进入页面的时候折叠的部分展开
 
 ```xml
 <com.loren.component.view.widget.SwipeHorizontalScrollView id="@+id/swipeHorizontalView">
