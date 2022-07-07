@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.loren.component.view.R
@@ -56,9 +55,6 @@ class HorizontalRecyclerView(
             defaultShowLeft = defaultShowLeft
         )
         rightScroll?.tag = child
-
-        decorateScrollView(rightScroll)
-
         super.addView(child, index, params)
         rightScroll?.scrollTo(recordX, 0)
     }
@@ -78,40 +74,14 @@ class HorizontalRecyclerView(
             foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
             defaultShowLeft = defaultShowLeft
         )
-        rightScroll?.tag = decorateScrollView(rightScroll)
         if (scrollViews.contains(rightScroll)) scrollViews.remove(rightScroll)
         scrollViews.add(rightScroll)
-    }
-
-    private fun decorateScrollView(scrollView: View?): FrameLayout {
-        val frameLayout = FrameLayout(context).apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        }
-        val shadowView = getShadowView()
-        val parent = scrollView?.parent as? ViewGroup?
-        parent?.removeView(scrollView)
-        scrollView?.let {
-            frameLayout.addView(it)
-        }
-        frameLayout.addView(shadowView)
-        parent?.addView(frameLayout)
-        return frameLayout
-    }
-
-    private fun getShadowView(): View {
-        return View(context).apply {
-            id = R.id.swipeHorizontalShadowView
-            setBackgroundResource(R.drawable.view_shadow)
-            layoutParams = MarginLayoutParams(36, ViewGroup.LayoutParams.MATCH_PARENT)
-            visibility = GONE
-        }
     }
 
     fun resetScrollX() {
         recordX = 0
         scrollViews.forEach {
             it.scrollTo(recordX, 0)
-            it.setShadow(recordX)
         }
     }
 
