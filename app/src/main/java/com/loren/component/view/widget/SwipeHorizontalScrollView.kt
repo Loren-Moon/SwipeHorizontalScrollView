@@ -38,16 +38,13 @@ class SwipeHorizontalScrollView(
     private var isNeedVibrate = true
     private var extendThreshold: Float? = null
     private var foldThreshold: Float? = null
-    private var defaultShowLeft = false
+    private var needFixItemPosition = false
 
     private var viewWidth = 0
     private var needFix = false
     private val mScroller by lazy { OverScroller(context) }
     private val firstViewWidth by lazy {
         getChildAt(0).measuredWidth
-    }
-    private val triggerThreshold by lazy {
-        if (defaultShowLeft) firstViewWidth else 0
     }
 
     private val gradientMatrix by lazy { Matrix() }
@@ -75,7 +72,7 @@ class SwipeHorizontalScrollView(
         isNeedVibrate: Boolean = true,
         extendThreshold: Float? = null,
         foldThreshold: Float? = null,
-        defaultShowLeft: Boolean = false
+        needFixItemPosition: Boolean = false
     ) {
         this.recyclerView = recyclerView
         this.isNeedHideLeftView = isNeedHideLeftView
@@ -83,7 +80,7 @@ class SwipeHorizontalScrollView(
         this.isNeedVibrate = isNeedVibrate
         this.extendThreshold = extendThreshold
         this.foldThreshold = foldThreshold
-        this.defaultShowLeft = defaultShowLeft
+        this.needFixItemPosition = needFixItemPosition
     }
 
     inner class GestureDetectorHelper : GestureDetector.SimpleOnGestureListener() {
@@ -123,19 +120,19 @@ class SwipeHorizontalScrollView(
                 val afterScrollX = scrollX + deltaX
 
                 if (isNeedHideLeftView) {
-                    if (afterScrollX >= triggerThreshold - firstViewWidth) {
-                        if (afterScrollX <= measuredWidth - viewWidth - (firstViewWidth - triggerThreshold)) {
-                            if (inFirstViewWidthRange(afterScrollX) || afterScrollX == triggerThreshold && deltaX < 0) {
-                                allViewsScrollX(scrollX + deltaX / 2)
-                            } else {
-                                allViewsScrollX(scrollX + deltaX)
-                            }
-                        } else if (afterScrollX <= triggerThreshold || deltaX < 0) { // view的条目很窄的情况下，不能向左滑动
+                    if (afterScrollX <= measuredWidth - viewWidth - firstViewWidth) {
+                        if (inFirstViewWidthRange(afterScrollX) || (afterScrollX == 0 && deltaX < 0)) {
+                            // 在firstView范围内滑动或者刚好处在firstView并且内容向右滑动，增加摩擦
                             allViewsScrollX(scrollX + deltaX / 2)
+                        } else {
+                            // 不需要摩擦
+                            allViewsScrollX(scrollX + deltaX)
                         }
+                    } else if (afterScrollX <= 0 || deltaX < 0) { // view的条目很窄的情况下，不能向左滑动
+                        allViewsScrollX(scrollX + deltaX / 2)
                     }
                 } else {
-                    if (afterScrollX >= triggerThreshold && afterScrollX <= measuredWidth - viewWidth) {
+                    if (afterScrollX >= 0 && afterScrollX <= measuredWidth - viewWidth) {
                         allViewsScrollX(scrollX + deltaX)
                     }
                 }
@@ -147,13 +144,13 @@ class SwipeHorizontalScrollView(
             if (recyclerView?.isShowLeft == true) {
 //                fixScrollX()
             } else {
-                if (mDirection == Direction.DIRECTION_RIGHT && scrollX < triggerThreshold) {
+                if (mDirection == Direction.DIRECTION_RIGHT && scrollX < firstViewWidth) {
 //                    fixScrollX()
                 } else {
                     if (isNeedHideLeftView) {
                         needFix = true
-                        val maxX = if (measuredWidth - firstViewWidth < viewWidth) triggerThreshold else measuredWidth - viewWidth
-                        val minX = triggerThreshold - ((extendThreshold ?: (firstViewWidth * 0.3f))).toInt()
+                        val maxX = if (measuredWidth - firstViewWidth < viewWidth) 0 else measuredWidth - viewWidth
+                        val minX = 0 - ((extendThreshold ?: (firstViewWidth * 0.3f))).toInt()
                         monitorScrollViews().forEach {
                             it.mScroller.fling(
                                 scrollX,
@@ -161,14 +158,14 @@ class SwipeHorizontalScrollView(
                                 -velocityX.toInt(),
                                 0,
                                 minX,
-                                maxX + (triggerThreshold - firstViewWidth),
+                                maxX - firstViewWidth,
                                 0,
                                 0
                             )
                             postInvalidate()
                         }
                     } else {
-                        val maxX = if (measuredWidth < viewWidth) triggerThreshold else measuredWidth - viewWidth
+                        val maxX = if (measuredWidth < viewWidth) 0 else measuredWidth - viewWidth
                         monitorScrollViews().forEach {
                             it.mScroller.fling(scrollX, 0, -velocityX.toInt(), 0, 0, maxX, 0, 0)
                             postInvalidate()
@@ -208,24 +205,22 @@ class SwipeHorizontalScrollView(
         var layoutLeft = 0
         for (i in 0 until childCount) {
             val childView = getChildAt(i)
-            val childViewWidth = childView.measuredWidth
-            val childViewHeight = childView.measuredHeight
-            // 需要隐藏左边第一个view&&是第一个元素的时候
-            if (isNeedHideLeftView && i == 0) {
-                layoutLeft = if (defaultShowLeft) {
-                    0
-                } else {
-                    -childViewWidth
+            if (childView.visibility != View.GONE) {
+                val childViewWidth = childView.measuredWidth
+                val childViewHeight = childView.measuredHeight
+                // 需要隐藏左边第一个view&&是第一个元素的时候
+                if (isNeedHideLeftView && i == 0) {
+                    layoutLeft = -childViewWidth
                 }
+                childView.layout(layoutLeft, paddingTop, layoutLeft + childViewWidth, paddingTop + childViewHeight)
+                layoutLeft += childViewWidth
             }
-            childView.layout(layoutLeft, paddingTop, layoutLeft + childViewWidth, paddingTop + childViewHeight)
-            layoutLeft += childViewWidth
         }
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if (isNeedShowShadow && ((defaultShowLeft && getRecordX() > getChildAt(0).measuredWidth) || (!defaultShowLeft && getRecordX() > 0))) {
+        if (isNeedShowShadow && getRecordX() > 0) {
             linearGradient.setLocalMatrix(gradientMatrix.apply { setTranslate(getRecordX().toFloat(), 0f) })
             canvas?.drawRect(getRecordX().toFloat(), 0f, getRecordX() + 36f, measuredHeight.toFloat(), shadowPaint)
         }
@@ -259,9 +254,12 @@ class SwipeHorizontalScrollView(
         return onTouchEvent
     }
 
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        scrollTo(getRecordX(), 0)
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (hasWindowFocus) {
+            recyclerView?.isShowLeft = getRecordX() < 0
+            scrollTo(getRecordX(), 0)
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -289,7 +287,7 @@ class SwipeHorizontalScrollView(
     }
 
     private fun inFirstViewWidthRange(afterScrollX: Int): Boolean {
-        return afterScrollX >= triggerThreshold - firstViewWidth && afterScrollX < triggerThreshold
+        return afterScrollX in -firstViewWidth until 0
     }
 
     private fun vibrate() {
@@ -317,9 +315,9 @@ class SwipeHorizontalScrollView(
             val threshold: Float
             if (recyclerView?.isShowLeft == true) { // 展开状态
                 threshold = foldThreshold ?: (firstViewWidth * 0.3f)
-                if (scrollX >= triggerThreshold - firstViewWidth && scrollX < triggerThreshold - firstViewWidth + threshold) {
+                if (scrollX >= -firstViewWidth && scrollX < -firstViewWidth + threshold) {
                     extend(interceptCancelEvent)
-                } else if (scrollX > triggerThreshold - firstViewWidth + threshold) {
+                } else if (scrollX >= -firstViewWidth + threshold) {
                     if (!interceptCancelEvent) {
                         vibrate()
                     }
@@ -327,12 +325,12 @@ class SwipeHorizontalScrollView(
                 }
             } else { // 收起状态
                 threshold = extendThreshold ?: (firstViewWidth * 0.3f)
-                if (scrollX < triggerThreshold - threshold) {
+                if (scrollX < 0 - threshold) {
                     if (!interceptCancelEvent) {
                         vibrate()
                     }
                     extend(interceptCancelEvent)
-                } else if (scrollX >= triggerThreshold - threshold && scrollX < triggerThreshold) {
+                } else if (scrollX >= 0 - threshold && scrollX <= 0) {
                     fold(interceptCancelEvent)
                 }
             }
@@ -345,7 +343,7 @@ class SwipeHorizontalScrollView(
      * 偏移tab位置
      */
     private fun offsetPosition() {
-        if (recyclerView?.isShowLeft != true) {
+        if (needFixItemPosition && recyclerView?.isShowLeft != true && (scrollX != 0 || scrollX != measuredWidth - viewWidth - firstViewWidth)) {
             var sumX = 0
             var stopIndexHeader = 0
             var stopIndexFooter = 0
@@ -377,7 +375,7 @@ class SwipeHorizontalScrollView(
      */
     private fun extend(interceptCancelEvent: Boolean = false) {
         monitorScrollViews().forEach {
-            it.mScroller.startScroll(scrollX, 0, if (defaultShowLeft) -scrollX else -firstViewWidth - scrollX, 0, 500)
+            it.mScroller.startScroll(scrollX, 0, -firstViewWidth - scrollX, 0, 500)
             postInvalidate()
         }
         recyclerView?.isShowLeft = true
@@ -393,7 +391,7 @@ class SwipeHorizontalScrollView(
         // 优化：左面被隐藏的view在展开的时候，view宽度的完整动画时长为800，要根据比例算出剩余view被隐藏的时长
         val duration = if (recyclerView?.isShowLeft == true) abs(1f * scrollX) / firstViewWidth * 1000 else 800
         monitorScrollViews().forEach {
-            it.mScroller.startScroll(scrollX, 0, if (defaultShowLeft) firstViewWidth - scrollX else -scrollX, 0, duration.toInt())
+            it.mScroller.startScroll(scrollX, 0, 0 - scrollX, 0, duration.toInt())
             postInvalidate()
         }
         recyclerView?.isShowLeft = false

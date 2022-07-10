@@ -100,6 +100,7 @@
         android:layout_height="wrap_content"
         app:extendThreshold="70dp"
         app:foldThreshold="60dp"
+        app:needFixItemPosition="true"
         app:needHideLeft="true"
         app:needShadow="true"
         app:needVibrate="true"

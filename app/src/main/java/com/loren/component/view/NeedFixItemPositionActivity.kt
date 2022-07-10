@@ -3,13 +3,12 @@ package com.loren.component.view
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.loren.component.view.databinding.ActivityDefaultShowLeftBinding
+import com.loren.component.view.databinding.ActivityFixItemPositionBinding
 import com.loren.component.view.widget.HorizontalRecyclerView
-import kotlin.math.roundToInt
 
-class DefaultShowLeftActivity : AppCompatActivity() {
+class NeedFixItemPositionActivity : AppCompatActivity() {
 
-    private val mBinding by lazy { ActivityDefaultShowLeftBinding.inflate(layoutInflater) }
+    private val mBinding by lazy { ActivityFixItemPositionBinding.inflate(layoutInflater) }
     private var stockAdapter: StockAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +25,6 @@ class DefaultShowLeftActivity : AppCompatActivity() {
         }
 
         stockAdapter = StockAdapter(list)
-        mBinding.rvStock.recordX = -(resources.displayMetrics.density * 200).roundToInt()
         mBinding.rvStock.adapter = stockAdapter
         mBinding.rvStock.bindHeadScrollView(mBinding.swipeHorizontalView)
         mBinding.rvStock.setOnHorizontalRecyclerViewStateListener(object : HorizontalRecyclerView.OnHorizontalRecyclerViewStateListener {

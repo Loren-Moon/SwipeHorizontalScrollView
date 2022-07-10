@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, DefaultShowLeftActivity::class.java))
     }
 
+    fun needFixItemPosition(view: View) {
+        startActivity(Intent(this, NeedFixItemPositionActivity::class.java))
+    }
+
 }
 
 class StockAdapter(private val data: List<StockModel>?) : RecyclerView.Adapter<StockAdapter.ViewHolder>() {

@@ -25,7 +25,7 @@ class HorizontalRecyclerView(
     private var needVibrate = true
     private var extendThreshold = -1f
     private var foldThreshold = -1f
-    private var defaultShowLeft = false
+    private var needFixItemPosition = false
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -36,9 +36,8 @@ class HorizontalRecyclerView(
         needVibrate = obtainStyledAttributes.getBoolean(R.styleable.HorizontalRecyclerView_needVibrate, needVibrate)
         extendThreshold = obtainStyledAttributes.getDimension(R.styleable.HorizontalRecyclerView_extendThreshold, extendThreshold)
         foldThreshold = obtainStyledAttributes.getDimension(R.styleable.HorizontalRecyclerView_foldThreshold, foldThreshold)
-        defaultShowLeft = obtainStyledAttributes.getBoolean(R.styleable.HorizontalRecyclerView_defaultShowLeft, defaultShowLeft)
+        needFixItemPosition = obtainStyledAttributes.getBoolean(R.styleable.HorizontalRecyclerView_needFixItemPosition, needFixItemPosition)
         obtainStyledAttributes.recycle()
-        isShowLeft = defaultShowLeft
     }
 
     override fun onScrollStateChanged(state: Int) {
@@ -52,7 +51,7 @@ class HorizontalRecyclerView(
             this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
             extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
             foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
-            defaultShowLeft = defaultShowLeft
+            needFixItemPosition = needFixItemPosition
         )
         rightScroll?.tag = child
         super.addView(child, index, params)
@@ -72,7 +71,7 @@ class HorizontalRecyclerView(
             this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
             extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
             foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
-            defaultShowLeft = defaultShowLeft
+            needFixItemPosition = needFixItemPosition
         )
         if (scrollViews.contains(rightScroll)) scrollViews.remove(rightScroll)
         scrollViews.add(rightScroll)

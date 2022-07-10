@@ -6,6 +6,6 @@
         <attr name="needVibrate" format="boolean" />
         <attr name="extendThreshold" format="dimension" />
         <attr name="foldThreshold" format="dimension" />
-        <attr name="defaultShowLeft" format="boolean" />
+        <attr name="needFixItemPosition" format="boolean" />
     </declare-styleable>
 </resources>

@@ -9,6 +9,7 @@
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.24166666666666667" />
         <entry key="app/src/main/res/drawable/view_shadow.xml" value="0.24166666666666667" />
         <entry key="app/src/main/res/layout/activity_default_show_left.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/activity_fix_item_position.xml" value="0.19907407407407407" />
         <entry key="app/src/main/res/layout/activity_hide_left.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_stock.xml" value="0.1" />
