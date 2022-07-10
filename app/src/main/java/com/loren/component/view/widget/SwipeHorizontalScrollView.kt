@@ -343,7 +343,7 @@ class SwipeHorizontalScrollView(
      * 偏移tab位置
      */
     private fun offsetPosition() {
-        if (needFixItemPosition && recyclerView?.isShowLeft != true && (scrollX != 0 || scrollX != measuredWidth - viewWidth - firstViewWidth)) {
+        if (needFixItemPosition && recyclerView?.isShowLeft != true && scrollX != measuredWidth - viewWidth - firstViewWidth) {
             var sumX = 0
             var stopIndexHeader = 0
             var stopIndexFooter = 0
