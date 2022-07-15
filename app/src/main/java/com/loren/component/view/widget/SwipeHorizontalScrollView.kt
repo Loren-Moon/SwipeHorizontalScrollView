@@ -120,16 +120,18 @@ class SwipeHorizontalScrollView(
                 val afterScrollX = scrollX + deltaX
 
                 if (isNeedHideLeftView) {
-                    if (afterScrollX <= measuredWidth - viewWidth - firstViewWidth) {
-                        if (inFirstViewWidthRange(afterScrollX) || (afterScrollX == 0 && deltaX < 0)) {
-                            // 在firstView范围内滑动或者刚好处在firstView并且内容向右滑动，增加摩擦
+                    if (afterScrollX >= -firstViewWidth) {
+                        if (afterScrollX <= measuredWidth - viewWidth - firstViewWidth) {
+                            if (inFirstViewWidthRange(afterScrollX) || (afterScrollX == 0 && deltaX < 0)) {
+                                // 在firstView范围内滑动或者刚好处在firstView并且内容向右滑动，增加摩擦
+                                allViewsScrollX(scrollX + deltaX / 2)
+                            } else {
+                                // 不需要摩擦
+                                allViewsScrollX(scrollX + deltaX)
+                            }
+                        } else if (afterScrollX <= 0 || deltaX < 0) { // view的条目很窄的情况下，不能向左滑动
                             allViewsScrollX(scrollX + deltaX / 2)
-                        } else {
-                            // 不需要摩擦
-                            allViewsScrollX(scrollX + deltaX)
                         }
-                    } else if (afterScrollX <= 0 || deltaX < 0) { // view的条目很窄的情况下，不能向左滑动
-                        allViewsScrollX(scrollX + deltaX / 2)
                     }
                 } else {
                     if (afterScrollX >= 0 && afterScrollX <= measuredWidth - viewWidth) {
