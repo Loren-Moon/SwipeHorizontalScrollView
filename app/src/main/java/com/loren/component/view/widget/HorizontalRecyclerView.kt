@@ -20,12 +20,12 @@ class HorizontalRecyclerView(
     var recordX: Int = 0
     var needNotify = true
     var isShowLeft = false
-    private var needHideLeft = false
-    private var needShadow = true
-    private var needVibrate = true
-    private var extendThreshold = -1f
-    private var foldThreshold = -1f
-    private var needFixItemPosition = false
+    var needHideLeft = false
+    var needShadow = true
+    var needVibrate = true
+    var extendThreshold = -1f
+    var foldThreshold = -1f
+    var needFixItemPosition = false
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -47,19 +47,17 @@ class HorizontalRecyclerView(
 
     override fun addView(child: View?, index: Int, params: ViewGroup.LayoutParams?) {
         val rightScroll = child?.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
-        rightScroll?.setRecyclerView(
-            this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
-            extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
-            foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
-            needFixItemPosition = needFixItemPosition
-        )
+        rightScroll?.setRecyclerView(this)
         rightScroll?.tag = child
-        super.addView(child, index, params)
         rightScroll?.scrollTo(recordX, 0)
+        rightScroll?.also { scrollViews.add(it) }
+        super.addView(child, index, params)
     }
 
-    override fun removeView(view: View?) {
-        super.removeView(view)
+    override fun onViewRemoved(child: View?) {
+        val rightScroll = child?.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
+        rightScroll?.also { scrollViews.remove(it) }
+        super.onViewRemoved(child)
     }
 
     /**
@@ -67,18 +65,13 @@ class HorizontalRecyclerView(
      */
     fun bindHeadScrollView(view: View) {
         val rightScroll = view.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
-        rightScroll.setRecyclerView(
-            this, isNeedHideLeftView = needHideLeft, isNeedShowShadow = needShadow, isNeedVibrate = needVibrate,
-            extendThreshold = if (extendThreshold == -1f) null else extendThreshold,
-            foldThreshold = if (foldThreshold == -1f) null else foldThreshold,
-            needFixItemPosition = needFixItemPosition
-        )
+        rightScroll.setRecyclerView(this)
         if (scrollViews.contains(rightScroll)) scrollViews.remove(rightScroll)
         scrollViews.add(rightScroll)
     }
 
-    fun resetScrollX() {
-        recordX = 0
+    fun resetScrollX(x: Int = 0) {
+        recordX = x
         scrollViews.forEach {
             it.scrollTo(recordX, 0)
         }
