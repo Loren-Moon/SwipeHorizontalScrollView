@@ -1,9 +1,9 @@
-package com.loren.component.view
+package com.loren.component.view.sample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.loren.component.view.databinding.ActivityDefaultShowLeftBinding
+import com.loren.component.view.sample.databinding.ActivityDefaultShowLeftBinding
 import com.loren.component.view.widget.HorizontalRecyclerView
 import kotlin.math.roundToInt
 

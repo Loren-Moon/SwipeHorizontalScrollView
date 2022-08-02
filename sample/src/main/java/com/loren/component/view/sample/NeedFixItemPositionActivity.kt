@@ -1,14 +1,14 @@
-package com.loren.component.view
+package com.loren.component.view.sample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.loren.component.view.databinding.ActivityHideLeftBinding
+import com.loren.component.view.sample.databinding.ActivityFixItemPositionBinding
 import com.loren.component.view.widget.HorizontalRecyclerView
 
-class HideLeftActivity : AppCompatActivity() {
+class NeedFixItemPositionActivity : AppCompatActivity() {
 
-    private val mBinding by lazy { ActivityHideLeftBinding.inflate(layoutInflater) }
+    private val mBinding by lazy { ActivityFixItemPositionBinding.inflate(layoutInflater) }
     private var stockAdapter: StockAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

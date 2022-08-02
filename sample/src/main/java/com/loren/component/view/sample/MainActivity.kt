@@ -1,4 +1,4 @@
-package com.loren.component.view
+package com.loren.component.view.sample
 
 import android.content.Intent
 import android.graphics.Color
@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.loren.component.view.databinding.ActivityMainBinding
+import com.loren.component.view.sample.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
