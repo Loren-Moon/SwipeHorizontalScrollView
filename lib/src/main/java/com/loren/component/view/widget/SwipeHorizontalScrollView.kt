@@ -5,10 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.os.Vibrator
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.OverScroller
 import kotlin.math.abs
 import kotlin.math.max
@@ -91,11 +88,13 @@ class SwipeHorizontalScrollView(
 
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
             (tag as? View)?.performClick()
+            recyclerView?.needNotify = true
             return true
         }
 
         override fun onLongPress(e: MotionEvent?) {
             (tag as? View)?.performLongClick()
+            recyclerView?.needNotify = true
             super.onLongPress(e)
         }
 
@@ -232,8 +231,8 @@ class SwipeHorizontalScrollView(
         }
     }
 
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
+    override fun onDrawForeground(canvas: Canvas?) {
+        super.onDrawForeground(canvas)
         if (isNeedShowShadow && getRecordX() > 0) {
             linearGradient.setLocalMatrix(gradientMatrix.apply { setTranslate(getRecordX().toFloat(), 0f) })
             canvas?.drawRect(getRecordX().toFloat(), 0f, getRecordX() + 36f, measuredHeight.toFloat(), shadowPaint)
@@ -278,14 +277,20 @@ class SwipeHorizontalScrollView(
         return super.dispatchTouchEvent(ev)
     }
 
+    private var lastDownX = 0f
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         when (ev?.action) {
             MotionEvent.ACTION_DOWN -> {
                 // 解决SwipeHorizontalScrollView嵌套RecyclerView的奇怪用法
                 helper.onTouchEvent(ev)
+                lastDownX = ev.x
             }
             MotionEvent.ACTION_MOVE -> {
-                return true
+                // 解决华为手机点击也会调用move事件
+                if (abs(ev.x - lastDownX) >= touchSlop) {
+                    return true
+                }
             }
         }
         return super.onInterceptTouchEvent(ev)

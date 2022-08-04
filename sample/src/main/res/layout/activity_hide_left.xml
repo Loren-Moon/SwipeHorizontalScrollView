@@ -37,7 +37,7 @@
                 android:textSize="36sp" />
 
             <TextView
-                android:layout_width="300dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="涨幅"

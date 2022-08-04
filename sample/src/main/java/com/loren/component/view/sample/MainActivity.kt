@@ -16,7 +16,6 @@ import com.loren.component.view.sample.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private val mBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private var stockAdapter: StockAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +32,10 @@ class MainActivity : AppCompatActivity() {
 
     fun needFixItemPosition(view: View) {
         startActivity(Intent(this, NeedFixItemPositionActivity::class.java))
+    }
+
+    fun dingColumn(view: View) {
+        startActivity(Intent(this, DingColumnActivity::class.java))
     }
 
 }

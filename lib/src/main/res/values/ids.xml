@@ -2,4 +2,5 @@
 <resources>
     <item name="swipeHorizontalView" type="id" />
     <item name="swipeHorizontalShadowView" type="id" />
+    <item name="swipeHorizontalDingWrapperView" type="id" />
 </resources>

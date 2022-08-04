@@ -25,4 +25,11 @@
         android:text="needFixItemPosition=true"
         android:textAllCaps="false" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="dingColumn"
+        android:text="仿懂车帝车型对比钉住功能"
+        android:textAllCaps="false" />
+
 </LinearLayout>

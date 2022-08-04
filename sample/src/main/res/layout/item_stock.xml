@@ -30,8 +30,9 @@
 
         <TextView
             android:id="@+id/tvName1"
-            android:layout_width="300dp"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
+            android:background="@color/white"
             android:gravity="center"
             android:textColor="@color/black"
             android:textSize="14sp" />

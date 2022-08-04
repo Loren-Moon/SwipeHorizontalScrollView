@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.loren.component.view.R
@@ -26,6 +27,7 @@ class HorizontalRecyclerView(
     var extendThreshold = -1f
     var foldThreshold = -1f
     var needFixItemPosition = false
+    var dingColumn: Int? = null
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -50,8 +52,50 @@ class HorizontalRecyclerView(
         rightScroll?.setRecyclerView(this)
         rightScroll?.tag = child
         rightScroll?.scrollTo(recordX, 0)
+        decorateScrollView(rightScroll)
         rightScroll?.also { scrollViews.add(it) }
         super.addView(child, index, params)
+    }
+
+    private var originalIndex: Int = 0
+    private fun decorateScrollView(scrollView: ViewGroup?) {
+        val parent = scrollView?.parent as? ViewGroup?
+        var dingWrapperLayout = parent?.findViewById<LinearLayoutCompat>(R.id.swipeHorizontalDingWrapperView)
+        if (dingWrapperLayout == null) {
+            dingWrapperLayout = LinearLayoutCompat(context).apply {
+                id = R.id.swipeHorizontalDingWrapperView
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            }
+            parent?.removeView(scrollView)
+            dingWrapperLayout.addView(scrollView)
+            parent?.addView(dingWrapperLayout)
+        }
+
+        if (scrollView != null) {
+            if (dingWrapperLayout.childCount > 1) {
+                val dingView = dingWrapperLayout.getChildAt(0)
+                dingWrapperLayout.removeViewAt(0)
+                scrollView.addView(dingView, originalIndex)
+
+                dingColumn?.let { column ->
+                    if (column < scrollView.childCount) {
+                        val needDingView = scrollView.getChildAt(column)
+                        scrollView.removeViewAt(column)
+                        dingWrapperLayout.addView(needDingView, 0)
+                    }
+                }
+            } else {
+                dingColumn?.let { column ->
+                    if (column < scrollView.childCount) {
+                        val needDingView = scrollView.getChildAt(column)
+                        scrollView.removeViewAt(column)
+                        dingWrapperLayout.addView(needDingView, 0)
+                        originalIndex = column
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onViewRemoved(child: View?) {
@@ -66,6 +110,7 @@ class HorizontalRecyclerView(
     fun bindHeadScrollView(view: View) {
         val rightScroll = view.findViewById<SwipeHorizontalScrollView>(R.id.swipeHorizontalView)
         rightScroll.setRecyclerView(this)
+        decorateScrollView(rightScroll)
         if (scrollViews.contains(rightScroll)) scrollViews.remove(rightScroll)
         scrollViews.add(rightScroll)
     }

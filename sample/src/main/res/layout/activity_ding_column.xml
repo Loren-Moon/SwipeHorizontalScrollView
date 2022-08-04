@@ -36,23 +36,55 @@
                 android:textColor="@android:color/white"
                 android:textSize="36sp" />
 
-            <TextView
+            <FrameLayout
                 android:layout_width="100dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="涨幅"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:background="@color/white">
 
-            <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:text="涨幅"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivZfDing"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginHorizontal="16dp"
+                    android:src="@android:drawable/btn_star_big_off" />
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="200dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="最新价"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:background="@color/white">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:text="最新价"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivZfDing2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginHorizontal="16dp"
+                    android:src="@android:drawable/btn_star_big_off" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="200dp"
@@ -98,10 +130,7 @@
         android:id="@+id/rvStock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:extendThreshold="70dp"
-        app:foldThreshold="60dp"
-        app:needFixItemPosition="true"
-        app:needHideLeft="true"
+        app:needHideLeft="false"
         app:needShadow="true"
         app:needVibrate="true"
         tools:listitem="@layout/item_stock" />

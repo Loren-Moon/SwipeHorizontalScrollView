@@ -10,6 +10,7 @@
 - `app:foldThreshold="60dp"`设置折叠的阈值
 - `app:needFixItemPosition="true|false"`设置是否需要自动修正item的位置
 - `HorizontalRecyclerView.recordX=-折叠view的width`设置默认进入页面的时候折叠的部分展开
+- `HorizontalRecyclerView.dingColumn=columnIndex|null`设置钉住某一列，null为取消钉住（仿写懂车帝车型PK对比的钉住功能），记得重新调用一次bindHeadScrollView同步状态给头部
 
 ```xml
 <com.loren.component.view.widget.SwipeHorizontalScrollView id="@+id/swipeHorizontalView">
