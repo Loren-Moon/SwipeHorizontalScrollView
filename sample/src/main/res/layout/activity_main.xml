@@ -32,4 +32,11 @@
         android:text="仿懂车帝车型对比钉住功能"
         android:textAllCaps="false" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="viewPager"
+        android:text="viewpager"
+        android:textAllCaps="false" />
+
 </LinearLayout>

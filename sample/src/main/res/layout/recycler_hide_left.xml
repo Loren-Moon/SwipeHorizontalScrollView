@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.loren.component.view.sample.NestedScrollableHost
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="MissingDefaultResource">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:ignore="MissingDefaultResource">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </com.loren.component.view.sample.NestedScrollableHost>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="2000dp"
+            android:background="@color/black" />
+
+    </LinearLayout>
+
+
+</androidx.core.widget.NestedScrollView>

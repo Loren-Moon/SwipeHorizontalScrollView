@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, DingColumnActivity::class.java))
     }
 
+    fun viewPager(view: View) {
+        startActivity(Intent(this, ViewPagerActivity::class.java))
+    }
+
 }
 
 class StockAdapter(private val data: List<StockModel>?) : RecyclerView.Adapter<StockAdapter.ViewHolder>() {

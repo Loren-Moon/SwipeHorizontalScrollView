@@ -28,6 +28,7 @@ class HorizontalRecyclerView(
     var foldThreshold = -1f
     var needFixItemPosition = false
     var dingColumn: Int? = null
+    var clickItem: SwipeHorizontalScrollView? = null
 
     init {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

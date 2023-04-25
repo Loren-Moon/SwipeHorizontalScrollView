@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.OverScroller
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sign
 
 /**
  * Created by Loren on 2021/12/31
@@ -269,12 +270,53 @@ class SwipeHorizontalScrollView(
         when (ev?.action) {
             MotionEvent.ACTION_DOWN -> {
                 recyclerView?.needNotify = false
+                setClickItem()
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 recyclerView?.needNotify = true
+                recyclerView?.clickItem = null
             }
         }
         return super.dispatchTouchEvent(ev)
+    }
+
+    private fun setClickItem() {
+        var v: View? = parent as? View
+        while (v != null && v !is HorizontalRecyclerView) {
+            v = v.parent as? View
+        }
+        (v as? HorizontalRecyclerView)?.clickItem = this
+    }
+
+    fun canChildScroll(orientation: Int, direction: Int): Boolean {
+        return when (orientation) {
+            0 -> {
+                val flag = canH(direction)
+//                if (flag) {
+//                    parent.requestDisallowInterceptTouchEvent(true)
+//                } else {
+//                    parent.requestDisallowInterceptTouchEvent(false)
+//                }
+                flag
+            }
+            1 -> {
+//                parent.requestDisallowInterceptTouchEvent(false)
+                true
+            }
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    fun fixInterceptTouchEvent(disallowIntercept:Boolean){
+        parent.requestDisallowInterceptTouchEvent(disallowIntercept)
+    }
+
+    private fun canH(direction: Int): Boolean {
+        if (direction > 0) {
+            return scrollX >= 0 && scrollX < measuredWidth - viewWidth
+        } else {
+            return scrollX > 0 && scrollX <= measuredWidth - viewWidth
+        }
     }
 
     private var lastDownX = 0f
